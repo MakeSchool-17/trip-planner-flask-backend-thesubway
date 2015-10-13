@@ -37,8 +37,24 @@ class MyObject(Resource):
 
 class Trip(Resource):
 
+    def post(self):
+        trip_collection = app.db.trips
+        result = trip_collection.insert_one(request.json)
+
+        trip = trip_collection.find_one({"_id": TripId(result.inserted_id)})
+
+        return trip
+
     def get(self, myobject_id):
-        pass
+        trip_collection = app.db.trips
+        trip = trip_collection.find_one({"_id": TripId(result.inserted_id)})
+
+        if trip is None:
+            response = jsonify(data=[])
+            response.status_code = 404
+            return response
+        else:
+            return trip
 
 
 # Add REST resource to API
@@ -47,8 +63,6 @@ api.add_resource(MyObject, '/myobject/', '/myobject/<string:myobject_id>')
 
 
 @api.representation('application/json')
-
-
 def output_json(data, code, headers=None):
     resp = make_response(JSONEncoder().encode(data), code)
     resp.headers.extend(headers or {})
