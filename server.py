@@ -40,7 +40,6 @@ class Trip(Resource):
     def post(self):
         trip_collection = app.db.trips
         result = trip_collection.insert_one(request.json)
-
         trip = trip_collection.find_one({"_id": ObjectId(result.inserted_id)})
 
         return trip
@@ -84,10 +83,9 @@ class Trip(Resource):
             return result
 
 
-
 # Add REST resource to API
 api.add_resource(MyObject, '/myobject/', '/myobject/<string:myobject_id>')
-api.add_resource(Trip, '/trip', '/trip/<string:trip_id>')
+api.add_resource(Trip, '/trip/', '/trip/<string:trip_id>')
 # provide a custom JSON serializer for flaks_restful
 
 
