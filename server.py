@@ -71,6 +71,19 @@ class Trip(Resource):
         result = myobject_collection.update_one(request.json)
         return result
 
+    def delete(self, trip_id):
+        trip_collection = app.db.trips
+        trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
+        if trip is None:
+            response = jsonify(data=[])
+            response.status_code = 404
+            return response
+        else:
+            myobject_collection = app.db.myobjects
+            result = myobject_collection.delete_one(request.json)
+            return result
+
+
 
 # Add REST resource to API
 api.add_resource(MyObject, '/myobject/', '/myobject/<string:myobject_id>')
