@@ -41,13 +41,13 @@ class Trip(Resource):
         trip_collection = app.db.trips
         result = trip_collection.insert_one(request.json)
 
-        trip = trip_collection.find_one({"_id": TripId(result.inserted_id)})
+        trip = trip_collection.find_one({"_id": ObjectId(result.inserted_id)})
 
         return trip
 
-    def get(self, myobject_id):
+    def get(self, trip_id):
         trip_collection = app.db.trips
-        trip = trip_collection.find_one({"_id": TripId(result.inserted_id)})
+        trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
 
         if trip is None:
             response = jsonify(data=[])
@@ -56,9 +56,25 @@ class Trip(Resource):
         else:
             return trip
 
+    def get_many(self, trip_ids):
+        pass
+
+    def put(self, trip_id):
+        # this calls get first, to find a property.
+        trip_collection = app.db.trips
+        trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
+        if trip is None:
+            response = jsonify(data=[])
+            response.status_code = 404
+            return response
+        myobject_collection = app.db.myobjects
+        result = myobject_collection.update_one(request.json)
+        return result
+
 
 # Add REST resource to API
 api.add_resource(MyObject, '/myobject/', '/myobject/<string:myobject_id>')
+api.add_resource(Trip, '/trip', '/trip/<string:trip_id>')
 # provide a custom JSON serializer for flaks_restful
 
 
