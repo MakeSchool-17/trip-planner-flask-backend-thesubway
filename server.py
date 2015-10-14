@@ -79,8 +79,8 @@ class Trip(Resource):
             return response
         else:
             myobject_collection = app.db.myobjects
-            result = myobject_collection.delete_one(request.json)
-            return result
+            result = myobject_collection.delete_one({"_id": ObjectId(trip_id)})
+            return trip_collection.find_one({"_id": ObjectId(trip_id)})
 
 
 # Add REST resource to API
