@@ -54,6 +54,8 @@ class FlaskrTestCase(unittest.TestCase):
         response = self.app.get('/myobject/55f0cbb4236f44b7f0e3cb23')
         self.assertEqual(response.status_code, 404)
 
+    # Trip tests
+
     def test_getting_trip(self):
         response = self.app.post('/trip/',
         data=json.dumps(dict(
@@ -93,6 +95,28 @@ class FlaskrTestCase(unittest.TestCase):
         postedObjectID = postResponseJSON["_id"]
         response = self.app.delete('/trip/' + postedObjectID)
         self.assertEqual(response.status_code, 200)
+
+    # User tests
+
+    def test_signup_user(self):
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password_hash="192fksa9z5k2"
+        )),
+        content_type='application/json')
+
+        responseJSON = json.loads(response.data.decode())
+        assert 'application/json' in response.content_type
+        assert 'NewUser' in responseJSON["name"]
+        assert "192fksa9z5k2" in responseJSON["password_hash"]
+        self.assertEqual(response.status_code, 200)
+
+    # def test_create_trip(self):
+    #     pass
+
+    # def test_verify_credentials_wrong(self):
+    #     pass
 
 if __name__ == '__main__':
     unittest.main()
