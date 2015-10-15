@@ -15,9 +15,12 @@ bcrypt = Bcrypt(app)
 
 def check_auth(username, password):
     pass
-    # bcrypt.generate_password_hash(password)
+    password_hash = bcrypt.generate_password_hash(password)
     # retrieve api pw key from database.
-    # app.db.users
+    auth_user = app.db.users[username]
+    if password_hash == auth_user.password_hash:
+        return True
+    return False
 
 
 def requires_auth(f):
@@ -118,6 +121,7 @@ class User(Resource):
     def __init__(self):
         self.trips = []
         self.name = None
+        self.password_hash = None
 
     def register(self, username, pw):
         pass
