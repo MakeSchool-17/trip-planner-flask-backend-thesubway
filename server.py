@@ -3,12 +3,23 @@ from flask_restful import Resource, Api
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from utils.mongo_json_encoder import JSONEncoder
+from flask.ext.bcrypt import Bcrypt
 
 # Basic Setup
 app = Flask(__name__)
 mongo = MongoClient('localhost', 27017)
 app.db = mongo.develop_database
 api = Api(app)
+bcrypt = Bcrypt(app)
+
+
+def check_auth(username, password):
+    hash_key = bcrypt.generate_password_hash(password)
+    print(hash_key)
+
+
+def requires_auth():
+    pass
 
 
 # Implement REST Resource
@@ -80,7 +91,7 @@ class Trip(Resource):
             return trip_collection.find_one({"_id": ObjectId(trip_id)})
 
 
-class User(resource):
+class User(Resource):
 
     # def get_all(self, trip_ids):
     #     trips = []
@@ -115,5 +126,6 @@ def output_json(data, code, headers=None):
 
 if __name__ == '__main__':
     # Turn this on in debug mode to get detailled information about request related exceptions: http://flask.pocoo.org/docs/0.10/config/
-    app.config['TRAP_BAD_REQUEST_ERRORS'] = True
-    app.run(debug=True)
+    # app.config['TRAP_BAD_REQUEST_ERRORS'] = True
+    # app.run(debug=True)
+    check_auth("test", "testpw")
