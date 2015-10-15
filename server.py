@@ -3,19 +3,22 @@ from flask_restful import Resource, Api
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from utils.mongo_json_encoder import JSONEncoder
-from flask.ext.bcrypt import Bcrypt
+from flask.ext.bcrypt import bcrypt
 
 # Basic Setup
 app = Flask(__name__)
 mongo = MongoClient('localhost', 27017)
 app.db = mongo.develop_database
 api = Api(app)
-bcrypt = Bcrypt(app)
+app.bcrypt_rounds = 12
+
+
+def hash_pw(pw):
+    return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt(app.bcrypt_rounds))
 
 
 def check_auth(username, password):
-    pass
-    password_hash = bcrypt.generate_password_hash(password)
+    password_hash = hash_pw(password)
     # retrieve api pw key from database.
     auth_user = app.db.users[username]
     if password_hash == auth_user.password_hash:
@@ -125,9 +128,12 @@ class User(Resource):
 
     def post(self):
         user_collection = app.db.users
+        password = request.json["password_entered"]
+        pass_hash = hash_pw(password)
+        request.json["password_entered"] = ""
+
         result = user_collection.insert_one(request.json)
         user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
-
         return user
 
 # Add REST resource to API
