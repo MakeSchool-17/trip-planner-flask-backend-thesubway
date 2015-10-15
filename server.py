@@ -123,8 +123,12 @@ class User(Resource):
         self.name = None
         self.password_hash = None
 
-    def register(self, username, pw):
-        pass
+    def post(self):
+        user_collection = app.db.users
+        result = user_collection.insert_one(request.json)
+        user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
+
+        return user
 
 # Add REST resource to API
 api.add_resource(MyObject, '/myobject/', '/myobject/<string:myobject_id>')
