@@ -14,12 +14,23 @@ bcrypt = Bcrypt(app)
 
 
 def check_auth(username, password):
-    hash_key = bcrypt.generate_password_hash(password)
-    print(hash_key)
-
-
-def requires_auth():
     pass
+    # bcrypt.generate_password_hash(password)
+    # retrieve api pw key from database.
+    # app.db.users
+
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            message = {"error": "Basic Auth Required."}
+            resp = jsonify(message)
+            resp.status_code = 401
+            return resp
+        return f(*args, **kwargs)
+    return decorated
 
 
 # Implement REST Resource
