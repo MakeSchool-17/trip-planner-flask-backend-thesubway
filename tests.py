@@ -102,14 +102,14 @@ class FlaskrTestCase(unittest.TestCase):
         response = self.app.post('/user/',
         data=json.dumps(dict(
           name="NewUser",
-          password_entered="test",
+          password="test",
         )),
         content_type='application/json')
 
         responseJSON = json.loads(response.data.decode())
         assert 'application/json' in response.content_type
         assert 'NewUser' in responseJSON["name"]
-        assert "" in responseJSON["password_entered"]
+        assert "test" not in responseJSON["password"]
         self.assertEqual(response.status_code, 200)
 
     # def test_create_trip(self):
