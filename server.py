@@ -128,9 +128,9 @@ class User(Resource):
 
     def post(self):
         user_collection = app.db.users
-        password = request.json["password_entered"]
+        password = request.json["password"]
         pass_hash = hash_pw(password)
-        request.json["password_entered"] = ""
+        request.json["password"] = str(pass_hash)
 
         result = user_collection.insert_one(request.json)
         user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
