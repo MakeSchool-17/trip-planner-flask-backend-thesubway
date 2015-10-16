@@ -137,7 +137,7 @@ class User(Resource):
         user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
         return user
 
-    # @requires_auth
+    @requires_auth
     def get(self, user_id):
         user_collection = app.db.users
         user = user_collection.find_one({"_id": ObjectId(user_id)})
