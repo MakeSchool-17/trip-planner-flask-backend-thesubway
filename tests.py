@@ -112,6 +112,19 @@ class FlaskrTestCase(unittest.TestCase):
         assert "test" not in responseJSON["password"]
         self.assertEqual(response.status_code, 200)
 
+    def test_login_user(self):
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="Another object",
+          password="test"
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+
+        response = self.app.get('/user/' + postedObjectID)
+        responseJSON = json.loads(response.data.decode())
+
     # def test_create_trip(self):
     #     pass
 
