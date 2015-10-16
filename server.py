@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from utils.mongo_json_encoder import JSONEncoder
 from flask.ext.bcrypt import bcrypt
+from functools import wraps
 
 # Basic Setup
 app = Flask(__name__)
@@ -121,10 +122,10 @@ class User(Resource):
     #             response.status_code = 404
     #             responses.append(response)
     #     return trips
-    def __init__(self):
-        self.trips = []
-        self.name = None
-        self.password_hash = None
+    # def __init__(self):
+    #     self.trips = []
+    #     self.name = None
+    #     self.password_hash = None
 
     def post(self):
         user_collection = app.db.users
@@ -134,6 +135,18 @@ class User(Resource):
 
         result = user_collection.insert_one(request.json)
         user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
+        return user
+
+    # @requires_auth
+    def get(self, user_id):
+        user_collection = app.db.users
+        user = user_collection.find_one({"_id": ObjectId(user_id)})
+        print("password please")
+        if user is None:
+            response = jsonify(data=[])
+            response.status_code = 404
+            return response
+        print("user exists")
         return user
 
 # Add REST resource to API
