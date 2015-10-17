@@ -21,8 +21,12 @@ def hash_pw(pw):
 def check_auth(username, password):
     password_hash = hash_pw(password)
     # retrieve api pw key from database.
-    auth_user = app.db.users[username]
-    if password_hash == auth_user.password_hash:
+    auth_user = app.db.users.find_one({"name": username})
+    if auth_user is None:
+        return False
+    print("password_hash is: " + str(password_hash))
+    print("compared to: " + str(auth_user['password_hash']))
+    if password_hash == auth_user['password_hash']:
         return True
     return False
 
@@ -141,12 +145,10 @@ class User(Resource):
     def get(self, user_id):
         user_collection = app.db.users
         user = user_collection.find_one({"_id": ObjectId(user_id)})
-        print("password please")
         if user is None:
             response = jsonify(data=[])
             response.status_code = 404
             return response
-        print("user exists")
         return user
 
 # Add REST resource to API
