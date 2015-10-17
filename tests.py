@@ -12,9 +12,9 @@ def create_auth_header():
     # encoded = pw_str.encode("utf-8")
     # encoded = str.encode(pw_str)
 
-    auth = 'Basic ' + b64encode(str.encode(pw_str)).decode('utf-8')
-    print("auth is: " + auth)
+    auth = 'Basic ' + b64encode(pw_str.encode('utf-8')).decode('utf-8')
     return {"Authorization": auth}
+    # resulting header: "Authorization: Basic TmV3VXNlcjp0ZXN0"
 
 
 class FlaskrTestCase(unittest.TestCase):
@@ -32,6 +32,7 @@ class FlaskrTestCase(unittest.TestCase):
         # Drop collection (significantly faster than dropping entire db)
         db.drop_collection('myobjects')
         db.drop_collection('trips')
+        db.drop_collection('users')
 
     # MyObject tests
 
@@ -122,7 +123,7 @@ class FlaskrTestCase(unittest.TestCase):
         responseJSON = json.loads(response.data.decode())
         assert 'application/json' in response.content_type
         assert 'NewUser' in responseJSON["name"]
-        assert "test" not in responseJSON["password"]
+        assert 'password' not in responseJSON
         self.assertEqual(response.status_code, 200)
 
     def test_login_user(self):

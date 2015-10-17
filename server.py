@@ -14,21 +14,19 @@ api = Api(app)
 app.bcrypt_rounds = 12
 
 
-def hash_pw(pw):
-    return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt(app.bcrypt_rounds))
+def hash_password(password, salt):
+    encoded = password.encode('utf-8')
+    return bcrypt.hashpw(encoded, salt)
 
 
 def check_auth(username, password):
-    password_hash = hash_pw(password)
     # retrieve api pw key from database.
-    auth_user = app.db.users.find_one({"name": username})
-    if auth_user is None:
+    user = app.db.users.find_one({"name": username})
+    if user is None:
         return False
-    print("password_hash is: " + str(password_hash))
-    print("compared to: " + str(auth_user['password_hash']))
-    if password_hash == auth_user['password_hash']:
-        return True
-    return False
+    password_hash = user['password']
+    password_encrypted = hash_password(password, salt=password_hash)
+    return password_encrypted == password_hash
 
 
 def requires_auth(f):
@@ -109,7 +107,7 @@ class Trip(Resource):
             return response
         else:
             myobject_collection = app.db.myobjects
-            result = myobject_collection.delete_one({"_id": ObjectId(trip_id)})
+            myobject_collection.delete_one({"_id": ObjectId(trip_id)})
             return trip_collection.find_one({"_id": ObjectId(trip_id)})
 
 
@@ -134,11 +132,12 @@ class User(Resource):
     def post(self):
         user_collection = app.db.users
         password = request.json["password"]
-        pass_hash = hash_pw(password)
-        request.json["password"] = str(pass_hash)
+        pass_hash = hash_password(password, bcrypt.gensalt(app.bcrypt_rounds))
+        request.json["password"] = pass_hash
 
         result = user_collection.insert_one(request.json)
         user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
+        del user['password']  # DO NOT return password back to the client!!!
         return user
 
     @requires_auth
@@ -149,6 +148,7 @@ class User(Resource):
             response = jsonify(data=[])
             response.status_code = 404
             return response
+        del user['password']  # DO NOT return password back to the client!!!
         return user
 
 # Add REST resource to API
