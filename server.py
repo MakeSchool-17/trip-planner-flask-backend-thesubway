@@ -134,6 +134,7 @@ class User(Resource):
         password = request.json["password"]
         pass_hash = hash_password(password, bcrypt.gensalt(app.bcrypt_rounds))
         request.json["password"] = pass_hash
+        request.json["trips"] = []
 
         result = user_collection.insert_one(request.json)
         user = user_collection.find_one({"_id": ObjectId(result.inserted_id)})
@@ -150,6 +151,16 @@ class User(Resource):
             return response
         del user['password']  # DO NOT return password back to the client!!!
         return user
+
+    def put(self, user_id):
+        user_collection = app.db.users
+        user = user_collection.find_one({"_id": ObjectId(user_id)})
+        if trip is None:
+            response = jsonify(data=[])
+            response.status_code = 404
+            return response
+        result = user_collection.update_one(request.json)
+        return result
 
 # Add REST resource to API
 api.add_resource(MyObject, '/myobject/', '/myobject/<string:myobject_id>')
