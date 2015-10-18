@@ -5,9 +5,12 @@ from pymongo import MongoClient
 from base64 import b64encode
 
 
-def create_auth_header():
+def create_auth_header(correct):
     username = "NewUser"
-    password = "test"
+    if correct == True:
+        password = "test"
+    else:
+        password = "testwrong"
     pw_str = "{0}:{1}".format(username, password)
     # encoded = pw_str.encode("utf-8")
     # encoded = str.encode(pw_str)
@@ -137,14 +140,24 @@ class FlaskrTestCase(unittest.TestCase):
         postedObjectID = postResponseJSON["_id"]
 
         response = self.app.get('/user/' + postedObjectID,
-                                headers=create_auth_header())
+                                headers=create_auth_header(True))
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
 
-    # def test_create_trip(self):
-    #     pass
+    def test_verify_credentials_wrong(self):
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+        response = self.app.get('/user/' + postedObjectID,
+                                headers=create_auth_header(False))
+        self.assertEqual(response.status_code, 401)
 
-    # def test_verify_credentials_wrong(self):
+    # def test_create_trip(self):
     #     pass
 
 if __name__ == '__main__':
