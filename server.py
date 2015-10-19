@@ -77,6 +77,7 @@ class Trip(Resource):
 
         return trip
 
+    @requires_auth
     def get(self, trip_id):
         trip_collection = app.db.trips
         trip = trip_collection.find_one({"_id": ObjectId(trip_id)})

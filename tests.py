@@ -94,14 +94,21 @@ class FlaskrTestCase(unittest.TestCase):
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]
 
-        response = self.app.get('/trip/' + postedObjectID)
+        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True))
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
         # [Ben-G] You should add assertions to your test case! Without assertions
         # this code doesn't test anything and will never fail
 
     def test_getting_non_existent_trip(self):
-        response = self.app.get('/trip/55f0cbb4236f44b7f0e3cb23')
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+
+        response = self.app.get('/trip/55f0cbb4236f44b7f0e3cb23', headers=create_auth_header(True))
         self.assertEqual(response.status_code, 404)
 
     def test_posting_trip(self):
@@ -150,7 +157,7 @@ class FlaskrTestCase(unittest.TestCase):
         postedObjectID = postResponseJSON["_id"]
         response = self.app.delete('/trip/' + postedObjectID, headers=create_auth_header(True))
         self.assertEqual(response.status_code, 200)
-        response = self.app.get('/trip/' + postedObjectID)
+        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True))
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 404)
         # [Ben-G] A good way for testing successful deletion would be to issue a GET
