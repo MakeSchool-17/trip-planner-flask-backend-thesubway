@@ -43,6 +43,7 @@ def requires_auth(f):
 
 
 # Implement REST Resource
+# [Ben-G] Example breakpoints can be removed once you've implemeted the trip API
 class MyObject(Resource):
 
     def post(self):
