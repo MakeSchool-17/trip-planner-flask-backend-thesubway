@@ -112,6 +112,15 @@ class FlaskrTestCase(unittest.TestCase):
     def test_deleting_trip(self):
         # [Ben-G] I'm assuming this is still in the works, but later this request
         # should require an authorization header
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+
         response = self.app.post('/trip/',
         data=json.dumps(dict(
           name="ToBeDeletedTrip"
@@ -119,7 +128,7 @@ class FlaskrTestCase(unittest.TestCase):
         content_type='application/json')
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]
-        response = self.app.delete('/trip/' + postedObjectID)
+        response = self.app.delete('/trip/' + postedObjectID, headers=create_auth_header(True))
         self.assertEqual(response.status_code, 200)
         response = self.app.get('/trip/' + postedObjectID)
         responseJSON = json.loads(response.data.decode())

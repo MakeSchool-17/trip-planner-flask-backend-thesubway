@@ -99,6 +99,7 @@ class Trip(Resource):
         result = myobject_collection.update_one(request.json)
         return result
 
+    @requires_auth
     def delete(self, trip_id):
         trip_collection = app.db.trips
         trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
