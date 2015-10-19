@@ -33,6 +33,15 @@ class FlaskrTestCase(unittest.TestCase):
         db = mongo.test_database
         server.app.db = db
 
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+
         # Drop collection (significantly faster than dropping entire db)
         db.drop_collection('myobjects')
         db.drop_collection('trips')
@@ -76,10 +85,20 @@ class FlaskrTestCase(unittest.TestCase):
     # Trip tests
 
     def test_getting_trip(self):
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+
         response = self.app.post('/trip/',
         data=json.dumps(dict(
           name="Another object"
         )),
+        headers=create_auth_header(True),
         content_type='application/json')
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]
@@ -97,10 +116,19 @@ class FlaskrTestCase(unittest.TestCase):
     def test_posting_trip(self):
         # [Ben-G] I'm assuming this is still in the works, but later this request
         # should require an authorization header
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+
         response = self.app.post('/trip/',
         data=json.dumps(dict(
             name="A trip"
         )),
+        headers=create_auth_header(True),
         content_type='application/json')
 
         responseJSON = json.loads(response.data.decode())
@@ -125,6 +153,7 @@ class FlaskrTestCase(unittest.TestCase):
         data=json.dumps(dict(
           name="ToBeDeletedTrip"
         )),
+        headers=create_auth_header(True),
         content_type='application/json')
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]

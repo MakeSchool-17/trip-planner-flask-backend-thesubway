@@ -69,6 +69,7 @@ class MyObject(Resource):
 
 class Trip(Resource):
 
+    @requires_auth
     def post(self):
         trip_collection = app.db.trips
         result = trip_collection.insert_one(request.json)
