@@ -72,9 +72,9 @@ class Trip(Resource):
     @requires_auth
     def post(self):
         trip_collection = app.db.trips
+        request.json['owner'] = request.authorization['username']
         result = trip_collection.insert_one(request.json)
         trip = trip_collection.find_one({"_id": ObjectId(result.inserted_id)})
-
         return trip
 
     @requires_auth
