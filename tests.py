@@ -33,15 +33,6 @@ class FlaskrTestCase(unittest.TestCase):
         db = mongo.test_database
         server.app.db = db
 
-        response = self.app.post('/user/',
-        data=json.dumps(dict(
-          name="NewUser",
-          password="test",
-        )),
-        content_type='application/json')
-        postResponseJSON = json.loads(response.data.decode())
-        postedObjectID = postResponseJSON["_id"]
-
         # Drop collection (significantly faster than dropping entire db)
         db.drop_collection('myobjects')
         db.drop_collection('trips')
