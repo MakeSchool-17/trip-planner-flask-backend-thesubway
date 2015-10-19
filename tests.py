@@ -121,6 +121,9 @@ class FlaskrTestCase(unittest.TestCase):
         postedObjectID = postResponseJSON["_id"]
         response = self.app.delete('/trip/' + postedObjectID)
         self.assertEqual(response.status_code, 200)
+        response = self.app.get('/trip/' + postedObjectID)
+        responseJSON = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 404)
         # [Ben-G] A good way for testing successful deletion would be to issue a GET
         # request to see if you can retrieve the deleted trip and expect the server
         # to return a 404 (Not Found) status code

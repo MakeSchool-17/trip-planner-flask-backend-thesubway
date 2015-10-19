@@ -107,8 +107,7 @@ class Trip(Resource):
             response.status_code = 404
             return response
         else:
-            myobject_collection = app.db.myobjects
-            myobject_collection.delete_one({"_id": ObjectId(trip_id)})
+            trip_collection.delete_one({"_id": ObjectId(trip_id)})
             return trip_collection.find_one({"_id": ObjectId(trip_id)})
 
 
