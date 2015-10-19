@@ -39,7 +39,7 @@ class FlaskrTestCase(unittest.TestCase):
         db.drop_collection('users')
 
     # MyObject tests
-    
+
     # [Ben-G] Once you've implemented the Trip API you can remove the tests for these example endpoints
     def test_posting_myobject(self):
         response = self.app.post('/myobject/',
@@ -86,6 +86,7 @@ class FlaskrTestCase(unittest.TestCase):
 
         response = self.app.get('/trip/' + postedObjectID)
         responseJSON = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 200)
         # [Ben-G] You should add assertions to your test case! Without assertions
         # this code doesn't test anything and will never fail
 
@@ -142,7 +143,7 @@ class FlaskrTestCase(unittest.TestCase):
 
     # [Ben-G] Would be better to name this 'test_valid_credentials' since the API doesn't
     # actually support the concept of login/logout
-    def test_login_user(self):
+    def test_valid_credentials(self):
         response = self.app.post('/user/',
         data=json.dumps(dict(
           name="NewUser",
