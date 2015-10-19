@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from base64 import b64encode
 
 
+# [Ben-G] Nice job extracting this into a separate function!
 def create_auth_header(correct):
     username = "NewUser"
     if correct == True:
@@ -38,7 +39,8 @@ class FlaskrTestCase(unittest.TestCase):
         db.drop_collection('users')
 
     # MyObject tests
-
+    
+    # [Ben-G] Once you've implemented the Trip API you can remove the tests for these example endpoints
     def test_posting_myobject(self):
         response = self.app.post('/myobject/',
         data=json.dumps(dict(
@@ -84,12 +86,16 @@ class FlaskrTestCase(unittest.TestCase):
 
         response = self.app.get('/trip/' + postedObjectID)
         responseJSON = json.loads(response.data.decode())
+        # [Ben-G] You should add assertions to your test case! Without assertions
+        # this code doesn't test anything and will never fail
 
     def test_getting_non_existent_trip(self):
         response = self.app.get('/trip/55f0cbb4236f44b7f0e3cb23')
         self.assertEqual(response.status_code, 404)
 
     def test_posting_trip(self):
+        # [Ben-G] I'm assuming this is still in the works, but later this request
+        # should require an authorization header
         response = self.app.post('/trip/',
         data=json.dumps(dict(
             name="A trip"
@@ -103,6 +109,8 @@ class FlaskrTestCase(unittest.TestCase):
         assert 'A trip' in responseJSON["name"]
 
     def test_deleting_trip(self):
+        # [Ben-G] I'm assuming this is still in the works, but later this request
+        # should require an authorization header
         response = self.app.post('/trip/',
         data=json.dumps(dict(
           name="ToBeDeletedTrip"
@@ -112,6 +120,9 @@ class FlaskrTestCase(unittest.TestCase):
         postedObjectID = postResponseJSON["_id"]
         response = self.app.delete('/trip/' + postedObjectID)
         self.assertEqual(response.status_code, 200)
+        # [Ben-G] A good way for testing successful deletion would be to issue a GET
+        # request to see if you can retrieve the deleted trip and expect the server
+        # to return a 404 (Not Found) status code
 
     # User tests
 
@@ -129,6 +140,8 @@ class FlaskrTestCase(unittest.TestCase):
         assert 'password' not in responseJSON
         self.assertEqual(response.status_code, 200)
 
+    # [Ben-G] Would be better to name this 'test_valid_credentials' since the API doesn't
+    # actually support the concept of login/logout
     def test_login_user(self):
         response = self.app.post('/user/',
         data=json.dumps(dict(
