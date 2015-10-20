@@ -86,6 +86,10 @@ class Trip(Resource):
             response = jsonify(data=[])
             response.status_code = 404
             return response
+        elif trip['owner'] != request.authorization['username']:
+            response = jsonify(data=[])
+            response.status_code = 401
+            return response
         else:
             return trip
 
