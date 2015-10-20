@@ -142,6 +142,31 @@ class FlaskrTestCase(unittest.TestCase):
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 401)
 
+    def test_get_many_trips(self):
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+
+        response = self.app.post('/trip/',
+        data=json.dumps(dict(
+          name="First Trip"
+        )),
+        headers=create_auth_header(True, "NewUser"),
+        content_type='application/json')
+
+        response = self.app.post('/trip/',
+        data=json.dumps(dict(
+          name="Second Trip"
+        )),
+        headers=create_auth_header(True, "NewUser"),
+        content_type='application/json')
+
+        response = self.app.get('/trip/', headers=create_auth_header(True, "NewUser"))
+        self.assertEqual(response.status_code, 200)
+
     def test_posting_trip(self):
         # [Ben-G] I'm assuming this is still in the works, but later this request
         # should require an authorization header
