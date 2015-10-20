@@ -6,8 +6,7 @@ from base64 import b64encode
 
 
 # [Ben-G] Nice job extracting this into a separate function!
-def create_auth_header(correct):
-    username = "NewUser"
+def create_auth_header(correct, username):
     if correct == True:
         password = "test"
     else:
@@ -89,12 +88,12 @@ class FlaskrTestCase(unittest.TestCase):
         data=json.dumps(dict(
           name="Another object"
         )),
-        headers=create_auth_header(True),
+        headers=create_auth_header(True, "NewUser"),
         content_type='application/json')
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]
 
-        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True))
+        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True, "NewUser"))
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
         # [Ben-G] You should add assertions to your test case! Without assertions
@@ -108,7 +107,7 @@ class FlaskrTestCase(unittest.TestCase):
         )),
         content_type='application/json')
 
-        response = self.app.get('/trip/55f0cbb4236f44b7f0e3cb23', headers=create_auth_header(True))
+        response = self.app.get('/trip/55f0cbb4236f44b7f0e3cb23', headers=create_auth_header(True, "NewUser"))
         self.assertEqual(response.status_code, 404)
 
     def test_posting_trip(self):
@@ -126,7 +125,7 @@ class FlaskrTestCase(unittest.TestCase):
         data=json.dumps(dict(
             name="A trip"
         )),
-        headers=create_auth_header(True),
+        headers=create_auth_header(True, "NewUser"),
         content_type='application/json')
 
         responseJSON = json.loads(response.data.decode())
@@ -151,13 +150,13 @@ class FlaskrTestCase(unittest.TestCase):
         data=json.dumps(dict(
           name="ToBeDeletedTrip"
         )),
-        headers=create_auth_header(True),
+        headers=create_auth_header(True, "NewUser"),
         content_type='application/json')
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]
-        response = self.app.delete('/trip/' + postedObjectID, headers=create_auth_header(True))
+        response = self.app.delete('/trip/' + postedObjectID, headers=create_auth_header(True, "NewUser"))
         self.assertEqual(response.status_code, 200)
-        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True))
+        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True, "NewUser"))
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 404)
         # [Ben-G] A good way for testing successful deletion would be to issue a GET
@@ -193,7 +192,7 @@ class FlaskrTestCase(unittest.TestCase):
         postedObjectID = postResponseJSON["_id"]
 
         response = self.app.get('/user/' + postedObjectID,
-                                headers=create_auth_header(True))
+                                headers=create_auth_header(True, "NewUser"))
         responseJSON = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
 
@@ -207,7 +206,7 @@ class FlaskrTestCase(unittest.TestCase):
         postResponseJSON = json.loads(response.data.decode())
         postedObjectID = postResponseJSON["_id"]
         response = self.app.get('/user/' + postedObjectID,
-                                headers=create_auth_header(False))
+                                headers=create_auth_header(False, "NewUser"))
         self.assertEqual(response.status_code, 401)
 
     # def test_create_trip(self):
