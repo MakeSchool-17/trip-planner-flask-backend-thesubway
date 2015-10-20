@@ -81,7 +81,12 @@ class Trip(Resource):
     def get(self, trip_id=None):
         trip_collection = app.db.trips
         if trip_id is None:
-            pass
+            trips = trip_collection.find()
+            users_trips = []
+            for each_trip in trips:
+                if each_trip['owner'] == request.authorization['username']:
+                    users_trips.append(each_trip)
+            return users_trips
         else:
             trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
             if trip is None:
