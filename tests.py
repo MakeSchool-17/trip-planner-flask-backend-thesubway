@@ -110,6 +110,38 @@ class FlaskrTestCase(unittest.TestCase):
         response = self.app.get('/trip/55f0cbb4236f44b7f0e3cb23', headers=create_auth_header(True, "NewUser"))
         self.assertEqual(response.status_code, 404)
 
+    def test_getting_other_users_trip(self):
+        # create user1
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+
+        # create user2
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser2",
+          password="test",
+        )),
+        content_type='application/json')
+
+        # create trip for user1
+        response = self.app.post('/trip/',
+        data=json.dumps(dict(
+          name="Another object"
+        )),
+        headers=create_auth_header(True, "NewUser"),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+
+        # attempt to access user1's trip for user2
+        response = self.app.get('/trip/' + postedObjectID, headers=create_auth_header(True, "NewUser2"))
+        responseJSON = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 401)
+
     def test_posting_trip(self):
         # [Ben-G] I'm assuming this is still in the works, but later this request
         # should require an authorization header
