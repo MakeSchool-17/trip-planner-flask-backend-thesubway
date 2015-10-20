@@ -165,6 +165,10 @@ class FlaskrTestCase(unittest.TestCase):
         content_type='application/json')
 
         response = self.app.get('/trip/', headers=create_auth_header(True, "NewUser"))
+        responseJSON = json.loads(response.data.decode())
+        assert len(responseJSON) == 2
+        assert "First Trip" in responseJSON[0]['name']
+        assert "Second Trip" in responseJSON[1]['name']
         self.assertEqual(response.status_code, 200)
 
     def test_posting_trip(self):
