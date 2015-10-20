@@ -78,20 +78,22 @@ class Trip(Resource):
         return trip
 
     @requires_auth
-    def get(self, trip_id):
+    def get(self, trip_id=None):
         trip_collection = app.db.trips
-        trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
-
-        if trip is None:
-            response = jsonify(data=[])
-            response.status_code = 404
-            return response
-        elif trip['owner'] != request.authorization['username']:
-            response = jsonify(data=[])
-            response.status_code = 401
-            return response
+        if trip_id is None:
+            pass
         else:
-            return trip
+            trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
+            if trip is None:
+                response = jsonify(data=[])
+                response.status_code = 404
+                return response
+            elif trip['owner'] != request.authorization['username']:
+                response = jsonify(data=[])
+                response.status_code = 401
+                return response
+            else:
+                return trip
 
     def put(self, trip_id):
         # this calls get first, to find a property.
