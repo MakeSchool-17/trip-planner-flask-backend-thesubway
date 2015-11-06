@@ -195,6 +195,47 @@ class FlaskrTestCase(unittest.TestCase):
         assert 'application/json' in response.content_type
         assert 'A trip' in responseJSON["name"]
 
+    # test case from Benji's code:
+    def test_unauthorized_posting_trip(self):
+        response = self.app.post('/trip/',
+                                 data=json.dumps(dict(
+                                     name="Stuttgart Roadtrip"
+                                 )),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+
+    def test_modifying_trip(self):
+        response = self.app.post('/user/',
+        data=json.dumps(dict(
+          name="NewUser",
+          password="test",
+        )),
+        content_type='application/json')
+        postResponseJSON = json.loads(response.data.decode())
+
+        response = self.app.post('/trip/',
+                                 headers=create_auth_header(True, "NewUser"),
+                                 data=json.dumps(dict(
+                                     name="A Trip"
+                                 )),
+                                 content_type='application/json')
+
+        postResponseJSON = json.loads(response.data.decode())
+        postedObjectID = postResponseJSON["_id"]
+
+        # code from Benji, for put call:
+        response = self.app.put('/trip/' + postedObjectID,
+                                headers=create_auth_header(True, "NewUser"),
+                                data=json.dumps(dict(
+                                    name="San Francisco Roadtrip",
+                                    _id=postedObjectID
+                                )),
+                                content_type='application/json')
+        responseJSON = json.loads(response.data.decode())
+
+        self.assertEqual(response.status_code, 200)
+        assert "San Francisco" in responseJSON["name"]
+
     def test_deleting_trip(self):
         # [Ben-G] I'm assuming this is still in the works, but later this request
         # should require an authorization header
