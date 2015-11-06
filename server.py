@@ -100,17 +100,21 @@ class Trip(Resource):
             else:
                 return trip
 
+    # put_request from benji:
+    @requires_auth
     def put(self, trip_id):
-        # this calls get first, to find a property.
+        new_trip = request.json
+        new_trip['user'] = request.authorization.username
         trip_collection = app.db.trips
-        trip = trip_collection.find_one({"_id": ObjectId(trip_id)})
-        if trip is None:
-            response = jsonify(data=[])
-            response.status_code = 404
-            return response
-        myobject_collection = app.db.myobjects
-        result = myobject_collection.update_one(request.json)
-        return result
+
+        # remove _id since we can't update it and would need to
+        # transform it into an ObjectId
+        del request.json['_id']
+        trip_collection.update_one({'_id': ObjectId(trip_id),
+                                    'owner': request.authorization.username},
+                                   {'$set': request.json})
+        trip = trip_collection.find_one(ObjectId(trip_id))
+        return trip
 
     @requires_auth
     def delete(self, trip_id):
